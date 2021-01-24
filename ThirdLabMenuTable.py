@@ -8,7 +8,7 @@ class MenuTable(TableCVS):
     """
     def __init__(self, tableName, daughters):
         super(MenuTable, self).__init__(tableName, 1)
-        self.daughterTables = [daughters]
+        self.daughterTables = daughters
 
     def add(self):
         key = self.askKeyForAction()

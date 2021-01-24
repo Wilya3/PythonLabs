@@ -11,7 +11,7 @@ class AuthorTable(TableCVS):
 
     def __init__(self, tableName, daughters):
         super(AuthorTable, self).__init__(tableName, 3)
-        self.daughterTables = [daughters]
+        self.daughterTables = daughters
 
     def add(self):
         key = self.askKeyForAction()

@@ -37,8 +37,8 @@ def printAll(tables):
 if __name__ == "__main__":
     listOfTables = []
     listOfTables.append(ContentTable("Content"))
-    listOfTables.append(MenuTable("Menu", listOfTables[0]))
-    listOfTables.append(AuthorTable("Author", listOfTables[0]))
+    listOfTables.append(MenuTable("Menu", [listOfTables[0]]))
+    listOfTables.append(AuthorTable("Author", [listOfTables[0]]))
     loadData(listOfTables)
     print("Инициализация закончена. Работа с таблицами разрешена")
     while True:
