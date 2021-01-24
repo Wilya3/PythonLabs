@@ -1,79 +1,38 @@
 import csv
-from MenuInterface import MenuInterface
 
 
-def chooseAddTable():
-    table = input().capitalize()
-    if table == "Menu":
-        menuInterface.add()
-    elif table == "Content":
-        ContentInterface.add()
-    elif table == "Author":
-        AuthorInterface.add()
-    else:
-        print("Неверный ввод! Отмена действия.")
+class TableCVS:
+    """
+    Таблица представлена в набора словарей, где...
+    Ключ словаря - первый элемент полученного массива;\n
+    Значение словаря - оставшиеся элементы полученного массива \n
 
+    Для лабораторной:\n
+    Меню:\n
+    первый элемент - id,\n
+    второй элемент - Название\n\n
 
-def chooseChangeTable():
-    table = input().capitalize()
-    if table == "Menu":
-        menuInterface.change()
-    elif table == "Content":
-        ContentInterface.change()
-    elif table == "Author":
-        AuthorInterface.change()
-    else:
-        print("Неверный ввод! Отмена действия.")
+    """
 
+    def __init__(self, tableName):
+        self.tableName = tableName
+        self.dictionary = {}
+        self.filePath = ""
 
-def chooseDeleteTable():
-    table = input().capitalize()
-    if table == "Menu":
-        menuInterface.delete()
-    elif table == "Content":
-        ContentInterface.delete()
-    elif table == "Author":
-        AuthorInterface.delete()
-    else:
-        print("Неверный ввод! Отмена действия.")
+    def load(self, filePath):
+        self.filePath = filePath
+        with open(self.filePath, "r") as f_obj:
+            reader = csv.reader(f_obj)
+            for row in reader:
+                # TODO: Проверить, удаляется ли первое значение списка, после занесения в ключ
+                self.dictionary[row.pop(0)] = row
 
+    def createFile(self):
+        try:
+            with open(self.filePath, "w+") as f_obj:
+                print("Новый файл создан")
+        except Exception:
+            print("Ошибка создания файла")
 
-if __name__ == "__main__":
-    menuInterface = MenuInterface()
-    contentInterface = ContentInterface()
-    authorInterface = AuthorInterface()
-
-
-    # TODO: Засунуть ввод названия файла с таблицей в соответствующую функцию класса
-    try:
-        menuInterface.load()
-    except IOError:
-        menuInterface.createFile()
-
-    # print("Введите название файла с таблицей Контент")
-    # contentFileName = input() + ".csv"
-    try:
-        ContentInterface.load()
-    except IOError:
-        ContentInterface.createFile()
-
-    # print("Введите название файла с таблицей Автор")
-    # authorFileName = input() + ".csv"
-    try:
-        AuthorInterface.load()
-    except IOError:
-        AuthorInterface.createFile()
-
-
-    while True:
-        print("Какое действие необходимо? (add/change/delete)")
-        action = input().lower()
-        if action == "add":
-            print("В какую таблицу добавляется запись? (Menu/Content/Author)")
-            chooseAddTable()
-        elif action == "change":
-            print("В какой таблице происходит изменение данных? (Menu/Content/Author)")
-            chooseChangeTable()
-        elif action == "delete":
-            print("Из какой таблицы удаляется запись? (Menu/Content/Author)")
-            chooseDeleteTable()
+    def update(self):  # TODO: update() функцию создать
+        pass
