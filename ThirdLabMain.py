@@ -10,64 +10,66 @@ def loadData(listOfTables):
             print("Введите название файла с таблицей " + table.tableName + " (Без расширения)")
             fileName = input() + ".csv"
             table.load(fileName)
-        except IndexError:
+        except KeyError:
             print("Ошибка. Значение ключа повторяется!")
             exit()
-        except:
+        except Exception:
             print("Открыть таблицу " + table.tableName + " не удалось. Создается новый файл...")
             table.createFile()
 
 
-def chooseTableForAction(action):
-    print("В какую таблицу добавляется запись? (Menu/Content/Author)")
+def chooseTableForAction():
+    print("С какой таблицей производится действие? (Menu/Content/Author)")
     requiredTableName = input().capitalize()
     isTableFound = False
     for table in listOfTables:
         if table.tableName == requiredTableName:
-            if action == "add":
-                table.add()
-            if action == "change":
-                table.change()
-            if action == "delete":
-                table.delete()
-            isTableFound = True
-            break
+            return table
     if not isTableFound:
         raise FileNotFoundError
+
+
+def printAll(tables):
+    for table in tables:
+        table.printTable()
 
 
 if __name__ == "__main__":
     listOfTables = []
     listOfTables.append(ContentTable("Content"))
-    listOfTables.append(MenuTable("Menu", [listOfTables[0]]))
-    listOfTables.append(AuthorTable("Author", [listOfTables[0]]))
+    listOfTables.append(MenuTable("Menu", listOfTables[0]))
+    listOfTables.append(AuthorTable("Author", listOfTables[0]))
     loadData(listOfTables)
     print("Инициализация закончена. Работа с таблицами разрешена")
-
     while True:
+        printAll(listOfTables)
         print("Какое действие необходимо? (add/change/delete/exit)")
         action = input().lower()
         if action != "add" and action != "change" and action != "delete" and action != "exit":
             print("Неверная команда! Повторите ввод")
             continue
         if action == "exit":
-            break
+            exit()
         try:
-            chooseTableForAction(action)
+            table = chooseTableForAction()
+            if action == "add":
+                table.add()
+            if action == "change":
+                table.change()
+            if action == "delete":
+                table.delete()
+            # isTableFound = True
+            for table in listOfTables:
+                table.save()
         except FileNotFoundError:
             print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
             continue
-        except IndexError:
+        except KeyError:
             print("Ошибка ввода ID таблицы! Действие отменяется...")
             continue
-
-        for table in listOfTables:
-            table.save()
-
-
-
-
-
+        except IndexError:
+            print("Значение столбца недопустимо! Действие отменяется...")
+            continue
 
         # chooseAddTable()
         # elif action == "change":
@@ -110,5 +112,3 @@ if __name__ == "__main__":
         #         authorInterface.delete()
         #     else:
         #         print("Неверный ввод! Отмена действия.")
-
-

@@ -6,25 +6,32 @@ class TableCVS:
     Таблица представлена в виде словаря, где...\n
     Ключ словаря - первый элемент загруженного массива;\n
     Значение словаря - массив из оставшихся элементов загруженного массива \n
-
+    {key : values[]} \n
+    0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
     Абстрактные методы add, change, delete \n
     key - определяет строку.
     """
 
-    def __init__(self, tableName):
+    # TODO: Использовать имена
+
+    def __init__(self, tableName, lengthOfValues):
         self.tableName = tableName
         self.dictionary = {}
         self.filePath = ""
+        self.lengthOfValues = lengthOfValues
 
     def load(self, filePath):
         self.filePath = filePath
         with open(self.filePath, "r") as f_obj:
             reader = csv.reader(f_obj)
             for row in reader:
-                if row[0] in self.dictionary:  # Если ключ уже есть, кинуть ошибку
-                    raise IndexError
-                # TODO: Проверить, удаляется ли первое значение списка, после занесения в ключ
-                self.dictionary[row.pop(0)] = row
+                if len(row) > 0:
+                    if row[0] in self.dictionary and len(row) != 0:  # Если ключ уже есть, кинуть ошибку
+                        raise KeyError
+                    # Массив без ключа (только values) должен быть равен указанной длине
+                    if len(row) - 1 != self.lengthOfValues:
+                        raise Exception
+                    self.dictionary[int(row.pop(0))] = row
 
     def createFile(self):
         try:
@@ -43,32 +50,37 @@ class TableCVS:
     def add(self):
         """
         Абстрактный метод добавления значения в таблицу! Необходимо перепоределять!\n
-        При неправильном key таблицы кидает IndexError\n
+        При неправильном key таблицы кидает KeyError\n
         (Переопределять необходимо из-за разного количества столбцов)\n
         """
 
     def delete(self):
         """
         Абстрактный метод удаления значения из таблицы! Необходимо перепоределять!\n
-        При неправильном key таблицы кидает IndexError\n
+        При неправильном key таблицы кидает KeyError\n
         (Переопределять необходимо из-за связанности таблиц)\n
         """
 
     def change(self):  # TODO: Проверить, можно ли реализовать в родительском
         """
-        Абстрактный метод изменения данных! Необходимо перепоределять!\n
-        При неправильном key таблицы или номере столбца кидает IndexError\n
-        (Переопределять необходимо из-за разного количества столбцов)\n
+
         """
         key = self.askKeyForAction()  # Выбираем строку
+        if not key in self.dictionary:
+            raise KeyError
         print("Введите номер столбца для изменения")
-        try:
-            i = int(input())  # Выбираем столбец
-            print("Введите новое значение")
-            self.dictionary[key][i] = input()
-        except Exception:
+        i = int(input())  # Выбираем столбец
+        if i < 0 or i >= self.lengthOfValues:
             raise IndexError
+        print("Введите новое значение")
+        self.dictionary[key][i] = input()
 
+    def printTable(self):
+        """
+        Выводит словарь
+        (Переопределять необходимо для более удобного представления)
+        """
+        print(self.dictionary)
 
     def getListByKey(self, key):
         """
@@ -78,21 +90,20 @@ class TableCVS:
         :param key:
         :return list:
         """
-        listOfRow = [key]
-        for column in self.dictionary[key]:
-            listOfRow.append(column)
+        listOfRow = list.copy(self.dictionary[key])
+        listOfRow.insert(0, key)
         return listOfRow
 
     def askKeyForAction(self):
         """
         Получает, проверяет и возвращает ключ.\n
-        При ошибке кидает IndexError\n
+        При ошибке кидает KeyError\n
         :return int key:\n
         """
         print("Введите ID(ключ) записи в виде целого числа")
         try:
-            id = int(input())
+            key = int(input())
         except Exception:
             print("Введено не целое число!")
-            raise IndexError
-        return id
+            raise KeyError
+        return key
