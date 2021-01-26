@@ -17,7 +17,7 @@ def loadData(listOfTables):
             table.createFile()
 
 
-def chooseTableForAction():
+def chooseTableForAction(listOfTables):
     print("С какой таблицей производится действие? (Menu/Content/Author)")
     requiredTableName = input().capitalize()
     for table in listOfTables:
@@ -26,30 +26,30 @@ def chooseTableForAction():
     raise FileNotFoundError
 
 
-def printAll(tables):
-    for table in tables:
+def printAll(listOfTables):
+    for table in listOfTables:
         print("\n" + table.tableName)
         table.printTable()
 
 
-def saveAll(tables):
-    for table in tables:
+def saveAll(listOfTables):
+    for table in listOfTables:
         table.save()
 
 
 if __name__ == "__main__":
-    listOfTables = []
+    tables = []
     contentTable = ContentTable("Content")
     menuTable = MenuTable("Menu", contentTable)
     authorTable = AuthorTable("Author", contentTable)
-    listOfTables.append(contentTable)
-    listOfTables.append(menuTable)
-    listOfTables.append(authorTable)
-    loadData(listOfTables)
+    tables.append(contentTable)
+    tables.append(menuTable)
+    tables.append(authorTable)
+    loadData(tables)
     
     print("Инициализация закончена. Работа с таблицами разрешена")
     while True:
-        printAll(listOfTables)
+        printAll(tables)
         print("Какое действие необходимо? (add/change/delete/exit)")
         action = input().lower()
         if action != "add" and action != "change" and action != "delete" and action != "exit":
@@ -58,14 +58,14 @@ if __name__ == "__main__":
         if action == "exit":
             break
         try:
-            table = chooseTableForAction()
+            table = chooseTableForAction(tables)
             if action == "add":
                 table.add()
             if action == "change":
                 table.change()
             if action == "delete":
                 table.delete()
-            saveAll(listOfTables)
+            saveAll(tables)
         except FileNotFoundError:
             print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
             continue

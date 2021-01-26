@@ -1,7 +1,7 @@
 import csv
 
 
-class TableCVS:
+class TableCSV:
     """
     Таблица представлена в виде словаря, где...\n
     Ключ словаря - первый элемент загруженного массива;\n
@@ -9,16 +9,16 @@ class TableCVS:
     {key : values[]} \n
     0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
     Абстрактные методы add, delete \n
-    key - определяет строку.
+    key - индекс строки.
     """
 
-    # TODO: Использовать имена
+    # TODO: Использовать имена столбцов
 
     def __init__(self, tableName, lengthOfValues):
         self.tableName = tableName
         self.dictionary = {}
         self.filePath = ""
-        self.lengthOfValues = lengthOfValues
+        self.lengthOfValues = lengthOfValues  # Количество столбцов (без столбца индексов (key))
 
     def load(self, filePath):
         self.filePath = filePath

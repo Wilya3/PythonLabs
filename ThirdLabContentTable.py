@@ -1,20 +1,20 @@
-from ThirdLabInterfaceCSV import TableCVS
+from ThirdLabInterfaceCSV import TableCSV
 
 
-class ContentTable(TableCVS):
+class ContentTable(TableCSV):
     """
     Таблица представлена в виде словаря, где...\n
     Ключ словаря - первый элемент загруженного массива;\n
     Значение словаря - массив из оставшихся элементов загруженного массива \n
     {key : values[]} \n
     0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
-    key - определяет строку.\n\n
-    id - [key]
-    Название [0]
-    Аннотация [1]
-    Содержимое [2]
-    ID_Автора - ключ таблицы Author [3]
-    ID_Меню - ключ таблицы Menu [4]
+    key - индекс строки.\n\n
+    id[key]
+    Название[0]
+    Аннотация[1]
+    Содержимое[2]
+    ID_Автора[3] - ключ таблицы Author
+    ID_Меню[4] - ключ таблицы Menu
     """
 
     def __init__(self, tableName):
