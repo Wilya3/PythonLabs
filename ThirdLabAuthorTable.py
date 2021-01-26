@@ -54,3 +54,11 @@ class AuthorTable(TableCVS):
             for column in self.dictionary[key]:
                 print(str(column) + " " * (15-len(column)), end='')
             print()
+
+    def printNumberOfContent(self):
+        for authorID in self.dictionary:
+            counter = 0
+            for key in self.daughterTables.dictionary:
+                if self.daughterTables.dictionary[key][3] == str(authorID):
+                    counter += 1
+            print("Количество контента автора " + self.dictionary[authorID][0] + ": " + str(counter))

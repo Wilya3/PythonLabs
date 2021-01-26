@@ -91,6 +91,9 @@ if __name__ == "__main__":
               (" " * (35 - len(authorTable.dictionary[int(contentTable.dictionary[key][3])][0]))) +
               str(contentTable.dictionary[key][1]))
 
+    authorTable.printNumberOfContent()
+
+
 
         # chooseAddTable()
         # elif action == "change":
