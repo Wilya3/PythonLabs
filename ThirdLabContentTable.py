@@ -3,6 +3,12 @@ from ThirdLabInterfaceCSV import TableCVS
 
 class ContentTable(TableCVS):
     """
+    Таблица представлена в виде словаря, где...\n
+    Ключ словаря - первый элемент загруженного массива;\n
+    Значение словаря - массив из оставшихся элементов загруженного массива \n
+    {key : values[]} \n
+    0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
+    key - определяет строку.\n\n
     id - [key]
     Название [0]
     Аннотация [1]
@@ -40,21 +46,21 @@ class ContentTable(TableCVS):
         self.dictionary.pop(key)
 
     def deleteByParentsID(self, parentsID, parentsIDColumn):
-        copyOfDictionary = self.dictionary
+        copyOfDictionary = self.dictionary.copy()
         for i in self.dictionary:
-            if self.dictionary[i][parentsIDColumn] == parentsID:
+            if self.dictionary[i][parentsIDColumn] == str(parentsID):
                 copyOfDictionary.pop(i)
-        self.dictionary = copyOfDictionary
+        self.dictionary = copyOfDictionary.copy
 
     def printTable(self):
-        print("ID" + " " * 10, end='')
-        print("Название [0]" + " " * 10, end='')
-        print("Аннотация [1]" + " " * 10, end='')
-        print("Содержимое [2]" + " " * 10, end='')
-        print("ID_Автора [3]" + " " * 10, end='')
+        print("ID" + " " * 18, end='')
+        print("Название [0]" + " " * 8, end='')
+        print("Аннотация [1]" + " " * 7, end='')
+        print("Содержимое [2]" + " " * 6, end='')
+        print("ID_Автора [3]" + " " * 7, end='')
         print("ID_Меню [4]")
         for key in self.dictionary:
-            print(str(key) + " " * 10, end='')
+            print(str(key) + " " * (20-len(str(key))), end='')
             for column in self.dictionary[key]:
-                print(str(column) + " " * 10, end='')
+                print(str(column) + " " * (20-len(column)), end='')
             print()

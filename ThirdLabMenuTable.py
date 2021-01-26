@@ -3,6 +3,12 @@ from ThirdLabInterfaceCSV import TableCVS
 
 class MenuTable(TableCVS):
     """
+    Таблица представлена в виде словаря, где...\n
+    Ключ словаря - первый элемент загруженного массива;\n
+    Значение словаря - массив из оставшихся элементов загруженного массива \n
+    {key : values[]} \n
+    0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
+    key - определяет строку.\n\n
     id - 6 столбец таблицы Content [key]
     Название [0]
     """
@@ -31,9 +37,9 @@ class MenuTable(TableCVS):
         self.daughterTables[0].deleteByParentsID(key, 4)
 
     def printTable(self):
-        print("ID" + " " * 10 + "Название [0]")
+        print("ID" + " " * 8 + "Название [0]")
         for key in self.dictionary:
-            print(str(key) + " " * 10, end='')
+            print(str(key) + (" " * (10-len(str(key)))), end='')
             for column in self.dictionary[key]:
-                print(str(column) + " " * 10, end='')
+                print(str(column) + " " * (10-len(column)), end='')
             print()

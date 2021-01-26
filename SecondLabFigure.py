@@ -8,7 +8,7 @@ class Figure:
             self.y = float(y)
         except Exception as e:
             print("Ошибка инициализации координат")
-            print(e.with_traceback())
+            print(e)
 
     @abstractmethod
     def calcPerimeter(self):

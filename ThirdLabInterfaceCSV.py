@@ -1,4 +1,4 @@
-import csv, abc
+import csv
 
 
 class TableCVS:
@@ -8,7 +8,7 @@ class TableCVS:
     Значение словаря - массив из оставшихся элементов загруженного массива \n
     {key : values[]} \n
     0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
-    Абстрактные методы add, change, delete \n
+    Абстрактные методы add, delete \n
     key - определяет строку.
     """
 
@@ -33,7 +33,7 @@ class TableCVS:
                         raise Exception
                     self.dictionary[int(row.pop(0))] = row
 
-    def createFile(self):
+    def createFile(self):  # TODO: Не перезаписывать неподходящий файл, а создавать новый файл рядом
         try:
             with open(self.filePath, "w+"):
                 print("Новый файл создан")
@@ -61,9 +61,10 @@ class TableCVS:
         (Переопределять необходимо из-за связанности таблиц)\n
         """
 
-    def change(self):  # TODO: Проверить, можно ли реализовать в родительском
+    def change(self):
         """
-
+        Изменяет выбранный столбец данной. Не изменяет ключи таблиц.
+        Не поддерживает связанность с другими таблицами.
         """
         key = self.askKeyForAction()  # Выбираем строку
         if not key in self.dictionary:
@@ -77,16 +78,17 @@ class TableCVS:
 
     def printTable(self):
         """
-        Выводит словарь
+        Выводит словарь.
         (Переопределять необходимо для более удобного представления)
         """
         print(self.dictionary)
 
     def getListByKey(self, key):
         """
+        Необходим для сохранения словаря в файл.\n
         Получает номер строки таблицы (key) и преобразует
         данную пару словаря в массив для сохранения. Полученный
-        одномерный массив содержит и значение словаря и его ключ.
+        одномерный массив содержит и значение словаря, и его ключ.
         :param key:
         :return list:
         """
@@ -94,7 +96,7 @@ class TableCVS:
         listOfRow.insert(0, key)
         return listOfRow
 
-    def askKeyForAction(self):
+    def askKeyForAction(self):  # TODO: Вынести в функцию
         """
         Получает, проверяет и возвращает ключ.\n
         При ошибке кидает KeyError\n

@@ -1,4 +1,3 @@
-from ThirdLabInterfaceCSV import TableCVS
 from ThirdLabAuthorTable import AuthorTable
 from ThirdLabMenuTable import MenuTable
 from ThirdLabContentTable import ContentTable
@@ -21,25 +20,33 @@ def loadData(listOfTables):
 def chooseTableForAction():
     print("С какой таблицей производится действие? (Menu/Content/Author)")
     requiredTableName = input().capitalize()
-    isTableFound = False
     for table in listOfTables:
         if table.tableName == requiredTableName:
             return table
-    if not isTableFound:
-        raise FileNotFoundError
+    raise FileNotFoundError
 
 
 def printAll(tables):
     for table in tables:
+        print("\n" + table.tableName)
         table.printTable()
+
+
+def saveAll(tables):
+    for table in tables:
+        table.save()
 
 
 if __name__ == "__main__":
     listOfTables = []
-    listOfTables.append(ContentTable("Content"))
-    listOfTables.append(MenuTable("Menu", [listOfTables[0]]))
-    listOfTables.append(AuthorTable("Author", [listOfTables[0]]))
+    contentTable = ContentTable("Content")
+    menuTable = MenuTable("Menu", contentTable)
+    authorTable = AuthorTable("Author", contentTable)
+    listOfTables.append(contentTable)
+    listOfTables.append(menuTable)
+    listOfTables.append(authorTable)
     loadData(listOfTables)
+    
     print("Инициализация закончена. Работа с таблицами разрешена")
     while True:
         printAll(listOfTables)
@@ -49,7 +56,7 @@ if __name__ == "__main__":
             print("Неверная команда! Повторите ввод")
             continue
         if action == "exit":
-            exit()
+            break
         try:
             table = chooseTableForAction()
             if action == "add":
@@ -58,9 +65,7 @@ if __name__ == "__main__":
                 table.change()
             if action == "delete":
                 table.delete()
-            # isTableFound = True
-            for table in listOfTables:
-                table.save()
+            saveAll(listOfTables)
         except FileNotFoundError:
             print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
             continue
@@ -70,6 +75,22 @@ if __name__ == "__main__":
         except IndexError:
             print("Значение столбца недопустимо! Действие отменяется...")
             continue
+
+
+
+
+
+
+    print("Название контента" + (" " * 18) + "Название меню" + (" " * 22) + "Ник автора" + (" " * 25) + "Аннотация")
+    for key in contentTable.dictionary:
+        print(str(contentTable.dictionary[key][0]) +
+              (" " * (35 - len(contentTable.dictionary[key][0]))) +
+              str(menuTable.dictionary[int(contentTable.dictionary[key][4])][0]) +
+              (" " * (35 - len(menuTable.dictionary[int(contentTable.dictionary[key][4])][0]))) +
+              str(authorTable.dictionary[int(contentTable.dictionary[key][3])][0]) +
+              (" " * (35 - len(authorTable.dictionary[int(contentTable.dictionary[key][3])][0]))) +
+              str(contentTable.dictionary[key][1]))
+
 
         # chooseAddTable()
         # elif action == "change":

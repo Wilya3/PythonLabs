@@ -1,6 +1,7 @@
 from SecondLabFigure import Figure
 import math
 
+
 class Rhombus(Figure):
     def __init__(self, x, y, side, angle):
         super(Rhombus, self).__init__(x, y)

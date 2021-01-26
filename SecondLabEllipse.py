@@ -1,6 +1,7 @@
 from SecondLabFigure import Figure
 import math
 
+
 class Ellipse(Figure):
     def __init__(self, x, y, bigAxis, smallAxis):
         super(Ellipse, self).__init__(x, y)

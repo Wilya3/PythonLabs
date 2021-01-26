@@ -3,6 +3,12 @@ from ThirdLabInterfaceCSV import TableCVS
 
 class AuthorTable(TableCVS):
     """
+    Таблица представлена в виде словаря, где...\n
+    Ключ словаря - первый элемент загруженного массива;\n
+    Значение словаря - массив из оставшихся элементов загруженного массива \n
+    {key : values[]} \n
+    0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
+    key - определяет строку.\n\n
     id - 5 столбец таблицы Content [key]
     Ник [0]
     Пароль [1]
@@ -39,12 +45,12 @@ class AuthorTable(TableCVS):
         self.daughterTables[0].deleteByParentsID(key, 3)
 
     def printTable(self):
-        print("ID" + " " * 10, end='')
-        print("Ник [0]" + " " * 10, end='')
-        print("Пароль [1]" + " " * 10, end='')
+        print("ID" + " " * 13, end='')
+        print("Ник [0]" + " " * 8, end='')
+        print("Пароль [1]" + " " * 5, end='')
         print("Почта [2]")
         for key in self.dictionary:
-            print(str(key) + " " * 10, end='')
+            print(str(key) + " " * (15-len(str(key))), end='')
             for column in self.dictionary[key]:
-                print(str(column) + " " * 10, end='')
+                print(str(column) + " " * (15-len(column)), end='')
             print()

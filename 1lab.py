@@ -1,14 +1,14 @@
 from datetime import date
 
 
-class App():
-    def __init__(self, name="default", cost=100, year=date.today().year):
+class Product:
+    def __init__(self, name="Default name", cost=100, year=date.today().year):
         self.name = name
         self.cost = cost
         self.year = year
 
     def __del__(self):
-        print("Объект удален")
+        print("Объект удален: " + self.name)
 
     def __str__(self):
         return "Название: " + self.name + ". Стоимость: " + str(self.cost) + ". Год производства: " + str(
@@ -19,13 +19,13 @@ class App():
         return different
 
     def increaseCostIfTV(self):
-        if self.name.rfind("TV") != -1:
+        if self.name.rfind("TV") != -1:  # Если в названии товара не будет подстроки TV, то увеличения не произойдет
             self.cost = self.cost * 1.2
 
 
 if __name__ == "__main__":
     print("Обработка стандартного объекта")
-    appObject = App()
+    appObject = Product()
     print("Лет прошло после создания товара: " + str(appObject.productReleaseDateYearsAgo()))
     appObject.increaseCostIfTV()
     print(appObject)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             cost = int(input())
             print("Введите год производства товара:")
             year = int(input())
-            listWithInputObjects.append(App(name, cost, year))
+            listWithInputObjects.append(Product(name, cost, year))
 
             print("Повторить ввод? (y/n)")
             answer = input()
