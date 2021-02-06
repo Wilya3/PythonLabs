@@ -1,6 +1,6 @@
-from ThirdLabAuthorTable import AuthorTable
-from ThirdLabMenuTable import MenuTable
-from ThirdLabContentTable import ContentTable
+from БД.ThirdLabAuthorTable import AuthorTable
+from БД.ThirdLabMenuTable import MenuTable
+from БД.ThirdLabContentTable import ContentTable
 
 
 def loadData(listOfTables):

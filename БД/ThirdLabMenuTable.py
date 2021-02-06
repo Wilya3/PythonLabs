@@ -1,7 +1,7 @@
-from ThirdLabInterfaceCSV import TableCSV
+from БД.ThirdLabInterfaceCSV import TableCSV
 
 
-class AuthorTable(TableCSV):
+class MenuTable(TableCSV):
     """
     Таблица представлена в виде словаря, где...\n
     Ключ словаря - первый элемент загруженного массива;\n
@@ -9,14 +9,11 @@ class AuthorTable(TableCSV):
     {key : values[]} \n
     0, abc, 88005553535 -> {0 : [abc, 88005553535]}\n
     key - индекс строки.\n\n
-    id[key] - 5 столбец таблицы Content
-    Ник[0]
-    Пароль[1]
-    Почта[2]
+    id[key] - 6 столбец таблицы Content
+    Название[0]
     """
-
     def __init__(self, tableName, daughters):
-        super(AuthorTable, self).__init__(tableName, 3)
+        super(MenuTable, self).__init__(tableName, 1)
         self.daughterTables = daughters
 
     def add(self):
@@ -24,13 +21,8 @@ class AuthorTable(TableCSV):
         if key in self.dictionary:
             print("Ошибка. Запись с таким ключем уже существует")
             raise KeyError
-        print("Введите ник:")
-        listOfValues = [input()]
-        print("Введите пароль:")
-        listOfValues.append(input())
-        print("Введите почту:")
-        listOfValues.append(input())
-        self.dictionary[key] = listOfValues
+        print("Введите название:")
+        self.dictionary[key] = [input()]
         print("Запись добавлена.")
 
     def delete(self):
@@ -40,25 +32,14 @@ class AuthorTable(TableCSV):
             raise KeyError
         self.dictionary.pop(key)
         # ГОВНОКОД. Просим дочернюю таблицу (0) удалить все значения,
-        # у которых в указанном (связанном) столбце (3) совпадает
+        # у которых в указанном (связанном) столбце (4) совпадает
         # значение с удаляемым ключом записи нашей таблицы (key)
-        self.daughterTables[0].deleteByParentsID(key, 3)
+        self.daughterTables[0].deleteByParentsID(key, 4)
 
     def printTable(self):
-        print("ID" + " " * 13, end='')
-        print("Ник [0]" + " " * 8, end='')
-        print("Пароль [1]" + " " * 5, end='')
-        print("Почта [2]")
+        print("ID" + " " * 8 + "Название [0]")
         for key in self.dictionary:
-            print(str(key) + " " * (15-len(str(key))), end='')
+            print(str(key) + (" " * (10-len(str(key)))), end='')
             for column in self.dictionary[key]:
-                print(str(column) + " " * (15-len(column)), end='')
+                print(str(column) + " " * (10-len(column)), end='')
             print()
-
-    def printNumberOfContent(self):
-        for authorID in self.dictionary:
-            counter = 0
-            for key in self.daughterTables.dictionary:
-                if self.daughterTables.dictionary[key][3] == str(authorID):
-                    counter += 1
-            print("Количество контента автора " + self.dictionary[authorID][0] + ": " + str(counter))

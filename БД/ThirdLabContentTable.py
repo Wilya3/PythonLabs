@@ -1,4 +1,4 @@
-from ThirdLabInterfaceCSV import TableCSV
+from БД.ThirdLabInterfaceCSV import TableCSV
 
 
 class ContentTable(TableCSV):
