@@ -111,13 +111,13 @@ class SQLQueryManager:
                 "\nDROP CONSTRAINT " + constraintName + ";"
         return query
 
-    def addValue(self, tableName, listOfColumns, listOfValues=None):
+    def addValue(self, tableName, listOfValues, listOfColumns=[]):
         """
         TODO: Доделать везде комментарии
-        If listOfColumns is empty, then all columns to fill necessary.
+        If listOfColumns is empty, then all columns to fill necessary.\n
         :param String tableName:\n
+        :param list listOfValues:\n
         :param list listOfColumns:\n
-        :param list listOfValues: (MAY BE EMPTY)\n
         :return String query:
         """
         query = "INSERT INTO " + tableName
@@ -138,44 +138,53 @@ class SQLQueryManager:
 
     def changeValue(self, tableName, columnName, newValue, conditionWhere=""):
         """
-        :return:
+        Change value of specified column. conditionWhere is not necessary.\n
+        :param String tableName:\n
+        :param String columnName:\n
+        :param String newValue:\n
+        :param String conditionWhere:\n
+        :return String query:
         """
         query = "UPDATE " + tableName + \
                 "\nSET " + columnName + " = " + newValue
-        if len(conditionWhere) > 0:
+        if len(conditionWhere) != 0:
             query += "\nWHERE " + conditionWhere
         query += ";"
+        return query
 
     def deleteValue(self, tableName, conditionWhere):
         """
-        :return:
+        Delete values from table with specified conditionWhere.\n
+        :param String tableName:\n
+        :param String conditionWhere:\n
+        :return String query:
         """
         query = "DELETE FROM " + tableName + \
                 "\nWHERE " + conditionWhere + ";"
+        return query
 
-    def getValue(self, tableName, ):
+    def getValue(self, tableName, listOfColumns=[], conditionWhere=""):
         """
-        :return:
+        Select values of specified columns (all columns, if listOfTables is empty).
+         conditionWhere is not necessary also.\n
+        :param String tableName:\n
+        :param list listOfColumns:\n
+        :param String conditionWhere:\n
+        :return String query:
         """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        query = "SELECT "
+        if len(listOfColumns) == 0:
+            query += "*"
+        else:
+            for i in range(len(listOfColumns)):
+                query += listOfColumns[i]
+                if i != len(listOfColumns) - 1:
+                    query += ", "
+        query += "\nFROM " + tableName
+        if len(conditionWhere) != 0:
+            query += "\nWHERE" + conditionWhere
+        query += ";"
+        return query
 
 
 
@@ -185,3 +194,18 @@ class SQLQueryManager:
     # def createDB(self, name):
     #     # query = "CREATE DATABASE " + str(name)
     #     pass
+
+    # def getValue(self, listOfTables, listOfColumns=[], conditionWhere="", conditionInnerJoins=[]):
+    #     """
+          # TODO: Сделать создание SELECT'а с JOIN'ами
+    #     :return:
+    #     """
+    #     query = "SELECT "
+    #     if len(listOfColumns) == 0:
+    #         query += "* "
+    #     else:
+    #         for i in range(len(listOfColumns)):
+    #             query += listOfColumns[i]
+    #             if i != len(listOfColumns) - 1:
+    #                 query += ", "
+    #     Акщь
