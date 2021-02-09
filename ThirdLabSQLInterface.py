@@ -100,6 +100,11 @@ class SQLInterface:
         """
         pass
 
+    def addValuesIntoTableFromCSV(self):
+        pass
+
+    def getValuesFromTableToCSV(self):
+        pass
 
 
 
