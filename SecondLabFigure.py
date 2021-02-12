@@ -17,3 +17,6 @@ class Figure:
     @abstractmethod
     def calcArea(self):
         pass
+
+    def print(self):
+        return "Я фигура"

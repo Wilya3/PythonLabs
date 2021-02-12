@@ -99,7 +99,7 @@ def closeAndExit(db):
     db.close()
     exit()
 
-
+def
 def askTableName():
     print("Введите название таблицы")
     return input()
