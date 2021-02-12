@@ -3,7 +3,7 @@ import csv
 
 def addQuotesToList(list):
     # Числа он самостоятельно к CHARACTER преобразовывает, а любые буквы без одинарных
-    # кавычке считает за название столбца.
+    # кавычек считает за название столбца.
     """
     Without quotes DB thinks: "trings are columns. I dont have so column"
     :param list:
@@ -22,24 +22,36 @@ class Table:
         self.columns = columns  # пока необязательно
         self.tempValues = []  # Double array. First dimension - rows, second - column.
 
+    def loadData(self, filePath):
+        """
+        Firstly load data to tempList in memory to check file correctness.
+        Then clear DB and add data from tempList to DB.
+        :raise: ValueError - read from file problem
+        :raise: UserWarning - add to DB problem
+        :param: listOfTables
+        """
+        try:
+            self.loadToTemp(filePath)
+            self.clear()  # TODO: Переделать в DELETE FROM [WHERE]
+            self.loadTempToDB()
+        except Exception:
+            raise UserWarning
+
     def loadToTemp(self, filePath):
         """
         :raise ValueError:
         :param filePath:
         """
-        try:
-            with open(filePath, "r") as f_obf:
-                reader = csv.reader(f_obf)  # TODO: Проверка на соответствие столбцов
-                self.tempValues = []
-                for value in reader:
-                    if len(value) == len(self.columns):
-                        readyList = addQuotesToList(value)
-                        self.tempValues.append(readyList)
-                print(self.tempValues)  # TODO: Убрать
-        except:
-            raise ValueError
+        with open(filePath, "r") as f_obf:
+            reader = csv.reader(f_obf)  # TODO: Проверка на соответствие столбцов
+            self.tempValues = []
+            for value in reader:
+                if len(value) == len(self.columns):
+                    readyList = addQuotesToList(value)
+                    self.tempValues.append(readyList)
+            print(self.tempValues)  # TODO: Убрать
 
-    def loadToDB(self):
+    def loadTempToDB(self):
         """
         Take data from self.tempValues and add to DB.
         """
@@ -58,19 +70,19 @@ class Table:
         query = "DELETE FROM " + self.name + ";"
         self.cursor.execute(query)
 
-    def createFile(self):
-        try:
-            with open(self.filePath, "w+"):
-                print("Новый файл создан")
-        except Exception:
-            print("Ошибка создания файла")
+    # def createFile(self):
+    #     try:
+    #         with open(self.filePath, "w+"):
+    #             print("Новый файл создан")
+    #     except Exception:
+    #         print("Ошибка создания файла")
 
-    def save(self):
-        with open(self.filePath, "w+") as f_obf:
+    def save(self, filePath):
+        self.cursor.execute("SELECT * FROM " + self.name + ";")
+        with open(filePath, "w+") as f_obf:
             writer = csv.writer(f_obf)
-            for key in self.dictionary:
-                listOfRow = self.getListByKey(key)
-                writer.writerow(listOfRow)
+            for row in self.cursor:
+                writer.writerow(row)
 
     def add(self):
         """

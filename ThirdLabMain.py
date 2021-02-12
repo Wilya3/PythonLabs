@@ -1,35 +1,15 @@
 import psycopg2
 from ThirdLabTableSQL import Table
 
-#TODO: Сделать не удаление, а слияние
-def loadData(listOfTables):
-    """
-    Firstly load data to tempList in memory to check file correctness.
-    Then clear DB and add data from tempList to DB.
-    :param: listOfTables
-    """
-    for table in listOfTables:
-        # try:
-            print("Введите название файла с таблицей " + table.name + " (Без расширения)")
-            fileName = input() + ".csv"
-            table.loadToTemp(fileName)
-            table.clear()  # TODO: Переделать в DELETE FROM [WHERE]
-            table.loadToDB()
-        # except ValueError:
-        #     print("Ошибка загрузки файла!")
-        # except Exception:
-        #     print("Ошибка добавления данных в базу данных!"
-        #           "\nВозможные проблемы:"
-        #           "\nДанные повреждены или не соответствуют таблице"
-        #           "\nПовторяются ключи")
+
+# TODO: Сделать не удаление, а слияние
 
 
-
-def chooseTableForAction(listOfTables):
+def askTableForAction(listOfTables):
     print("С какой таблицей производится действие? (Menu/Content/Author)")
-    requiredTableName = input().capitalize()
+    requiredName = input().capitalize()
     for table in listOfTables:
-        if table.name == requiredTableName:
+        if table.name == requiredName:
             return table
     raise FileNotFoundError
 
@@ -40,9 +20,10 @@ def printAll(listOfTables):
         table.printTable()
 
 
-def saveAll(listOfTables):
-    for table in listOfTables:
-        table.save()
+def askFile(table):
+    print("Введите название файла с таблицей " + table.name + " (Без расширения)")
+    fileName = input() + ".csv"
+    return fileName
 
 
 if __name__ == "__main__":
@@ -64,31 +45,47 @@ if __name__ == "__main__":
         printAll(tables)
         print("Какое действие необходимо? (load/save/add/change/delete/exit)")
         action = input().lower()
-        # if action != "add" and action != "change" and action != "delete" and action != "exit":
-        #     print("Неверная команда! Повторите ввод")
-        #     continue
+        if action != "add" and \
+                action != "change" and \
+                action != "delete" and \
+                action != "exit" and \
+                action != "load" and \
+                action != "save":
+            print("Неверная команда! Повторите ввод")
+            continue
         if action == "exit":
             break
         try:
-            table = chooseTableForAction(tables)
+            table = askTableForAction(tables)
             if action == "add":
                 table.add()
             if action == "change":
                 table.change()
             if action == "delete":
                 table.delete()
+            if action == "save":
+                fileName = askFile(table)
+                table.save(fileName)
             if action == "load":
-                print("Вы уверены? Все данные в БД будут перезаписаны данными из файлов! (y/n)")
+                print("Вы уверены? Все данные в БД будут перезаписаны данными из файла!"
+                      "Дочерние таблицы будут очищены! (y/n)")
                 if input() == "y":
-                    loadData(tables)
+                    fileName = askFile(table)
+                    table.loadData(fileName)
                 else:
                     print("Отмена команды...")
-            if action == "save":
-                saveAll(tables)
-            # TODO: Разобраться с исключениями
+                    continue
+        # TODO: Разобраться с исключениями
         except FileNotFoundError:
             print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
             continue
+        # except ValueError: TODO: loadToTemp Error найти
+        #     print("Ошибка загрузки файла!")
+        except UserWarning:
+            print("Ошибка добавления данных в базу данных!"
+                  "\nВозможные проблемы:"
+                  "\nДанные повреждены или не соответствуют таблице"
+                  "\nПовторяются ключи")
         except KeyError:
             print("Ошибка ввода ID таблицы! Действие отменяется...")
             continue
@@ -98,9 +95,6 @@ if __name__ == "__main__":
 
     cursor.close()
     connection.close()
-
-
-
 
     # print("Название контента" + (" " * 18) + "Название меню" + (" " * 22) + "Ник автора" + (" " * 25) + "Аннотация")
     # for key in contentTable.dictionary:
