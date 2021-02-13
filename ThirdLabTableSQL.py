@@ -22,6 +22,26 @@ class Table:
         self.columns = columns  # пока необязательно
         self.tempValues = []  # Double array. First dimension - rows, second - column.
 
+    def firstTask(self):
+        """
+        First task from laboratory. Select this:
+        Для каждого контента:
+        «Название контента»,
+        «название меню», «ник
+        автора», «аннотация».
+        """
+        pass
+
+    def secondTask(self):
+        """
+        First task from laboratory. Select this:
+        Для каждого контента:
+        «Название контента»,
+        «название меню», «ник
+        автора», «аннотация».
+        """
+        pass
+
     def loadData(self, filePath):
         """
         Firstly load data to tempList in memory to check file correctness.
@@ -39,6 +59,7 @@ class Table:
 
     def loadToTemp(self, filePath):
         """
+        Load data to tempList in memory to check file correctness.
         :raise ValueError:
         :param filePath:
         """
@@ -77,6 +98,10 @@ class Table:
     #         print("Ошибка создания файла")
 
     def save(self, filePath):
+        """
+        Save table to specified file.
+        :param String filePath:
+        """
         self.cursor.execute("SELECT * FROM " + self.name + ";")
         with open(filePath, "w+") as f_obf:
             writer = csv.writer(f_obf)
