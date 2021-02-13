@@ -1,11 +1,13 @@
 import psycopg2
 from ThirdLabTableSQL import Table
 
+# TODO: Вынести интерфейс в класс RussianUI
+# TODO: SELECT по лабе №1
+# TODO: SELECT по лабе №2
+# TODO: Узнать насчет ввода id
+# TODO: Слияние, а не удаление
 
-# TODO: Сделать не удаление, а слияние
-
-
-def askTableForAction(listOfTables):
+def askTable(listOfTables):
     print("С какой таблицей производится действие? (Menu/Content/Author)")
     requiredName = input().capitalize()
     for table in listOfTables:
@@ -14,16 +16,17 @@ def askTableForAction(listOfTables):
     raise FileNotFoundError
 
 
+def askFile(table):
+    print("Введите название файла с таблицей " + table.name + " (Без расширения)")
+    fileName = input() + ".csv"
+    return fileName
+
+
 def printAll(listOfTables):
     for table in listOfTables:
         print("\n" + table.name)
         table.printTable()
 
-
-def askFile(table):
-    print("Введите название файла с таблицей " + table.name + " (Без расширения)")
-    fileName = input() + ".csv"
-    return fileName
 
 
 if __name__ == "__main__":
@@ -36,6 +39,7 @@ if __name__ == "__main__":
         Table("Author", cursor, ["id", "nick", "password", "email"]),
         Table("Content", cursor, ["id", "title", "annotation", "content", "id_author", "id_menu"])
     ]
+    #UI = RussianUI()  # TODO: Должна быть фабрика в идеале
     # TODO: Сделать словарь
     # actions = ["load", "save", "add", "change", "delete", "exit"]
 
@@ -56,25 +60,46 @@ if __name__ == "__main__":
         if action == "exit":
             break
         try:
-            table = askTableForAction(tables)
+            table = askTable(tables)
+
             if action == "add":
-                table.add()
+                print("Введите данные для каждого столбца через пробел")
+                print(table.columns)
+                row = input().split(" ")
+                table.add(row)
+
             if action == "change":
-                table.change()
+                print("Внимание! Связанные данные из дочерних таблиц будут изменены!"
+                      "Введите столбец для изменения")
+                column = input()
+                print("\nВведите условие WHERE (email = 'pochta')."
+                      "\nИли не вводите ничего для изменения всех строк.")
+                conditionWhere = input()
+                print("Введите новое значение")
+                newValue = input()
+                table.change(column, newValue, conditionWhere)
+
             if action == "delete":
-                table.delete()
+                print("Введите условие WHERE (email = 'pochta')."
+                      "\nИли не вводите ничего для удаления всех строк."
+                      "\nВнимание! Связанные данные из дочерних таблиц будут удалены!")
+                condition = input()
+                table.delete(condition)
+
             if action == "save":
                 fileName = askFile(table)
                 table.save(fileName)
+
             if action == "load":
                 print("Вы уверены? Все данные в БД будут перезаписаны данными из файла!"
-                      "Дочерние таблицы будут очищены! (y/n)")
+                      "\nВнимание! Связанные данные из дочерних таблиц будут удалены! (y/n)")
                 if input() == "y":
                     fileName = askFile(table)
                     table.loadData(fileName)
                 else:
                     print("Отмена команды...")
                     continue
+
         # TODO: Разобраться с исключениями
         except FileNotFoundError:
             print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
@@ -92,6 +117,9 @@ if __name__ == "__main__":
         except IndexError:
             print("Значение столбца недопустимо! Действие отменяется...")
             continue
+        finally:
+            print("Нажмите на любую кнопку")
+            input()
 
     cursor.close()
     connection.close()

@@ -14,7 +14,7 @@ def addQuotesToList(list):
             list[i] = "'" + list[i] + "'"
     return list
 
-
+# TODO: Разобраться с try-except
 class Table:
     def __init__(self, tableName, cursor, columns):
         self.name = tableName
@@ -25,14 +25,14 @@ class Table:
     def loadData(self, filePath):
         """
         Firstly load data to tempList in memory to check file correctness.
-        Then clear DB and add data from tempList to DB.
-        :raise: ValueError - read from file problem
-        :raise: UserWarning - add to DB problem
-        :param: listOfTables
+        Then clear table and add data from tempList to DB.
+        :raise: ValueError - reading from file problem
+        :raise: UserWarning - adding to DB problem
+        :param: filePath
         """
         try:
             self.loadToTemp(filePath)
-            self.clear()  # TODO: Переделать в DELETE FROM [WHERE]
+            self.delete()
             self.loadTempToDB()
         except Exception:
             raise UserWarning
@@ -43,13 +43,12 @@ class Table:
         :param filePath:
         """
         with open(filePath, "r") as f_obf:
-            reader = csv.reader(f_obf)  # TODO: Проверка на соответствие столбцов
+            reader = csv.reader(f_obf)
             self.tempValues = []
             for value in reader:
                 if len(value) == len(self.columns):
                     readyList = addQuotesToList(value)
                     self.tempValues.append(readyList)
-            print(self.tempValues)  # TODO: Убрать
 
     def loadTempToDB(self):
         """
@@ -84,25 +83,52 @@ class Table:
             for row in self.cursor:
                 writer.writerow(row)
 
-    def add(self):
+    def add(self, listOfValues):
         """
-        Абстрактный метод добавления значения в таблицу! Необходимо перепоределять!\n
-        При неправильном key таблицы кидает KeyError\n
-        (Переопределять необходимо из-за разного количества столбцов)\n
+        Add new values to DB.
+        :param list listOfValues:\n
         """
+        try:
+            readyList = addQuotesToList(listOfValues)
+            query = "INSERT INTO " + self.name
+            query += "\nVALUES ("
+            for i in range(len(readyList)):
+                query += readyList[i]
+                if i != len(readyList) - 1:
+                    query += ", "
+            query += ");"
+            self.cursor.execute(query)
+        except:
+            raise BaseException
 
-    def delete(self):
+    def delete(self, conditionWhere=""):
         """
-        Абстрактный метод удаления значения из таблицы! Необходимо перепоределять!\n
-        При неправильном key таблицы кидает KeyError\n
-        (Переопределять необходимо из-за связанности таблиц)\n
+        Delete values from table with specified conditionWhere
+        or all values, if conditionWhere is empty.
+        :param String conditionWhere:\n
         """
+        try:
+            query = "DELETE FROM " + self.name
+            if conditionWhere != "":
+                    query += "\nWHERE " + conditionWhere
+            query += ";"
+            self.cursor.execute(query)
+        except:
+            print("Ошибка удаления.")
 
-    def change(self):
+    def change(self, column, newValue, conditionWhere=""):
         """
-        Изменяет выбранный столбец таблицы. Не изменяет ключи таблиц.
-        Не поддерживает связанность с другими таблицами.
+        Change value of specified column . conditionWhere is not necessary.\n
+        :param String column:\n
+        :param String newValue:\n
+        :param String conditionWhere:\n
         """
+        query = "UPDATE " + self.name + \
+                "\nSET " + column + " = '" + newValue + "'"
+        if len(conditionWhere) != 0:
+            query += "\nWHERE " + conditionWhere
+        query += ";"
+        self.cursor.execute(query)
 
     def printTable(self):
         """
@@ -112,30 +138,3 @@ class Table:
         self.cursor.execute(query)
         for row in self.cursor:
             print(row)
-
-    # def getListByKey(self, key):
-    #     """
-    #     Необходим для сохранения словаря в файл.\n
-    #     Получает номер строки таблицы (key) и преобразует
-    #     данную пару словаря в массив для сохранения. Полученный
-    #     одномерный массив содержит и значение словаря, и его ключ.
-    #     :param key:
-    #     :return list:
-    #     """
-    #     listOfRow = list.copy(self.dictionary[key])
-    #     listOfRow.insert(0, key)
-    #     return listOfRow
-    #
-    # def askKeyForAction(self):  # TODO: Вынести в функцию
-    #     """
-    #     Получает, проверяет и возвращает ключ.\n
-    #     При ошибке кидает KeyError\n
-    #     :return int key:\n
-    #     """
-    #     print("Введите ID(ключ) записи в виде целого числа")
-    #     try:
-    #         key = int(input())
-    #     except Exception:
-    #         print("Введено не целое число!")
-    #         raise KeyError
-    #     return key

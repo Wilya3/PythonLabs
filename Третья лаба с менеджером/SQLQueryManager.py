@@ -147,7 +147,7 @@ def addValue(tableName, listOfValues, listOfColumns=[]):
 def changeValue(tableName, columnName, newValue, conditionWhere=""):
     """
     DOESNT EXECUTE A QUERY. Only returns SQL query\n
-    Change value of specified column. conditionWhere is not necessary.\n
+    Change newValue of specified column. conditionWhere is not necessary.\n
     :param String tableName:\n
     :param String columnName:\n
     :param String newValue:\n
