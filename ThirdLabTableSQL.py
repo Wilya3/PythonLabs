@@ -5,14 +5,15 @@ def addQuotesToList(list):
     # Числа он самостоятельно к CHARACTER преобразовывает, а любые буквы без одинарных
     # кавычек считает за название столбца.
     """
-    Without quotes DB thinks: "trings are columns. I dont have so column"
+    Without quotes DB thinks: "Strings are columns. I don't have so column"
     :param list:
-    :return:
+    :return listWithQuotes:
     """
     for i in range(len(list)):
         if not list[i].isdigit():
             list[i] = "'" + list[i] + "'"
     return list
+
 
 # TODO: Разобраться с try-except
 class Table:
@@ -21,26 +22,6 @@ class Table:
         self.cursor = cursor
         self.columns = columns  # пока необязательно
         self.tempValues = []  # Double array. First dimension - rows, second - column.
-
-    def firstTask(self):
-        """
-        First task from laboratory. Select this:
-        Для каждого контента:
-        «Название контента»,
-        «название меню», «ник
-        автора», «аннотация».
-        """
-        pass
-
-    def secondTask(self):
-        """
-        First task from laboratory. Select this:
-        Для каждого контента:
-        «Название контента»,
-        «название меню», «ник
-        автора», «аннотация».
-        """
-        pass
 
     def loadData(self, filePath):
         """
@@ -86,17 +67,6 @@ class Table:
             query += ");\n"
         self.cursor.execute(query)
 
-    def clear(self):
-        query = "DELETE FROM " + self.name + ";"
-        self.cursor.execute(query)
-
-    # def createFile(self):
-    #     try:
-    #         with open(self.filePath, "w+"):
-    #             print("Новый файл создан")
-    #     except Exception:
-    #         print("Ошибка создания файла")
-
     def save(self, filePath):
         """
         Save table to specified file.
@@ -124,7 +94,7 @@ class Table:
             query += ");"
             self.cursor.execute(query)
         except:
-            raise BaseException
+            raise AddError
 
     def delete(self, conditionWhere=""):
         """
@@ -139,7 +109,7 @@ class Table:
             query += ";"
             self.cursor.execute(query)
         except:
-            print("Ошибка удаления.")
+            raise DeleteError
 
     def change(self, column, newValue, conditionWhere=""):
         """

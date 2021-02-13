@@ -1,6 +1,8 @@
 import psycopg2
+import pandas as pd
 from ThirdLabTableSQL import Table
 from ThirdLabUI import UIFactory
+
 
 # TODO: SELECT по лабе №1
 # TODO: SELECT по лабе №2
@@ -8,6 +10,11 @@ from ThirdLabUI import UIFactory
 # TODO: Слияние, а не удаление
 
 def askTable(listOfTables):
+    """
+    Find Table object in list and return it.
+    :param listOfTables:
+    :return Table table:
+    """
     print(UI.table())
     requiredName = input().capitalize()
     for table in listOfTables:
@@ -26,6 +33,44 @@ def printAll(listOfTables):
     for table in listOfTables:
         print("\n" + table.name)
         table.printTable()
+
+
+def listToPandas(listOfColumns, listOfValues):
+    dataFrame = pd.DataFrame()
+    columnCounter = 0
+    for i in range(len(listOfColumns)):
+        columnOfValues = []
+        for j in range(len(listOfValues)):
+            columnOfValues.append(listOfValues[j][i])
+        dataFrame.insert(columnCounter, listOfColumns[i], columnOfValues)
+        columnCounter += 1
+    return dataFrame
+
+
+def firstTask(cursor):
+    """
+    First task from laboratory. Select this:
+    Для каждого контента:
+    «Название контента»,
+    «название меню», «ник
+    автора», «аннотация».
+    """
+    cursor.execute("SELECT content.title, menu.title, author.nick, content.annotation"
+                   "\nFROM content"
+                   "\nJOIN menu ON (content.id_menu = menu.id)"
+                   "\nJOIN author ON (content.id_author = author.id);")
+    listOfValues = []
+    for row in cursor:
+        listOfValues.append(row)
+    df = listToPandas(["Название контента", "Название меню", "Ник автора", "Аннотация"], listOfValues)
+    print(df)
+
+def secondTask(cursor):
+    """
+
+    :param cursor:
+    :return:
+    """
 
 
 if __name__ == "__main__":
@@ -48,8 +93,7 @@ if __name__ == "__main__":
     print(UI.initialization())
 
     while True:
-        printAll(tables)
-        print(UI.action() + " (first/second/load/save/add/change/delete/exit)")
+        print(UI.action() + " (print/first/second/load/save/add/change/delete/exit)")
         action = input().lower()
         if action != "add" and \
                 action != "change" and \
@@ -58,25 +102,31 @@ if __name__ == "__main__":
                 action != "load" and \
                 action != "first" and \
                 action != "second" and \
+                action != "print" and \
                 action != "save":
             print(UI.wrongCommand())
             continue
         if action == "exit":
             break
         try:
-            table = askTable(tables)
+            if action == "print":
+                printAll(tables)
+                continue
 
             if action == "first":
-                table.firstTask()
+                firstTask(cursor)
+                continue
 
             if action == "second":
-                table.secondTask()
+                continue
+
+            table = askTable(tables)
 
             if action == "add":
                 table.printTable()
                 print(UI.values())
                 print(table.columns)
-                values = input().split(" ")
+                values = input().split(" ")  # Попробовать сломать
                 table.add(values)
 
             if action == "change":
