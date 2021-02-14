@@ -59,6 +59,18 @@ class UI(object):
     def pressAnyButton(self):
         pass
 
+    def connectionError(self):
+        pass
+
+    def fileNotFoundError(self):
+        pass
+
+    def queryError(self):
+        pass
+
+    def badFileError(self):
+        pass
+
 
 class RussianUI(UI):
     def table(self):
@@ -77,7 +89,7 @@ class RussianUI(UI):
         return "Введите название столбца"
 
     def values(self):
-        return "Введите данные для каждого столбца через пробел"
+        return "Введите данные для каждого столбца"
 
     def newValue(self):
         return "Введите новое значение"
@@ -108,6 +120,23 @@ class RussianUI(UI):
 
     def pressAnyButton(self):
         return "Для продолжения нажмите на любую кнопку..."
+
+    def connectionError(self):
+        return "Ошибка соединения с базой данных!\nПрограмма завершает свое выполнение..."
+
+    def fileNotFoundError(self):
+        return "Ошибка! Таблица с таким именем не найдена. Действие отменяется..."
+
+    def queryError(self):
+        return "Ошибка добавления данных в базу данных!" \
+               "\nВозможные проблемы:" \
+               "\n-Данные повреждены или не соответствуют типам столбцов" \
+               "\n-Повторяются значения первичного ключа" \
+               "\n-Неправильный ввод условия WHERE" \
+               "\n-Неправильно указан столбец (команда change)"
+
+    def badFileError(self):
+        return "Ошибка! Файл поврежден или содержит некорректные данные!"
 
 
 class EnglishUI(UI):

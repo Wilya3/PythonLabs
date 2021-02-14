@@ -1,17 +1,15 @@
 import psycopg2
 import pandas as pd
-from ThirdLabTableSQL import Table
+from ThirdLabTableSQL import *
 from ThirdLabUI import UIFactory
 
 
-# TODO: SELECT по лабе №1
-# TODO: SELECT по лабе №2
 # TODO: Узнать насчет ввода id
-# TODO: Слияние, а не удаление
 
 def askTable(listOfTables):
     """
     Find Table object in list and return it.
+    :raise FileNotFoundError:
     :param listOfTables:
     :return Table table:
     """
@@ -20,7 +18,7 @@ def askTable(listOfTables):
     for table in listOfTables:
         if table.name == requiredName:
             return table
-    raise FileNotFoundError  # TODO: Разобраться с ошибками
+    raise FileNotFoundError
 
 
 def askFile(table):
@@ -35,7 +33,7 @@ def printAll(listOfTables):
         table.printTable()
 
 
-def listToPandas(listOfColumns, listOfValues):
+def listToPandas(listOfColumns, listOfValues):  # Дублируется
     dataFrame = pd.DataFrame()
     columnCounter = 0
     for i in range(len(listOfColumns)):
@@ -54,6 +52,7 @@ def firstTask(cursor):
     «Название контента»,
     «название меню», «ник
     автора», «аннотация».
+    :param cursor:
     """
     cursor.execute("SELECT content.title, menu.title, author.nick, content.annotation"
                    "\nFROM content"
@@ -65,19 +64,39 @@ def firstTask(cursor):
     df = listToPandas(["Название контента", "Название меню", "Ник автора", "Аннотация"], listOfValues)
     print(df)
 
+
 def secondTask(cursor):
     """
-
+    First task from laboratory. Select this:
+    Для каждого пользователя:
+    количество контента,
+    которое он добавил.
     :param cursor:
-    :return:
     """
+    cursor.execute("SELECT author.nick, COUNT(*) "
+                   "FROM author JOIN content ON (author.id = content.id_author)"
+                   "GROUP BY author.nick;")
+    listOfValues = []
+    for row in cursor:
+        listOfValues.append(row)
+    df = listToPandas(["Ник автора", "Количество контента"], listOfValues)
+    print(df)
 
 
 if __name__ == "__main__":
-    connection = psycopg2.connect(dbname='PythonLabs', user='postgres',
-                                  password='python', host='localhost')
-    connection.autocommit = True
-    cursor = connection.cursor()
+    Factory = UIFactory()
+    UI = Factory.createUI("russian")
+
+    connection = None
+    cursor = None
+    try:
+        connection = psycopg2.connect(dbname='PythonLabs', user='postgres',
+                                      password='python', host='localhost')
+        connection.autocommit = True
+        cursor = connection.cursor()
+    except:
+        print(UI.connectionError())
+        exit()
 
     tables = [
         Table("Menu", cursor, ["id", "title"]),
@@ -85,8 +104,6 @@ if __name__ == "__main__":
         Table("Content", cursor, ["id", "title", "annotation", "content", "id_author", "id_menu"])
     ]
 
-    Factory = UIFactory()
-    UI = Factory.createUI("russian")  # TODO: Должна быть фабрика в идеале
     # TODO: Сделать словарь
     # actions = ["load", "save", "add", "change", "delete", "exit"]
 
@@ -118,6 +135,7 @@ if __name__ == "__main__":
                 continue
 
             if action == "second":
+                secondTask(cursor)
                 continue
 
             table = askTable(tables)
@@ -126,7 +144,10 @@ if __name__ == "__main__":
                 table.printTable()
                 print(UI.values())
                 print(table.columns)
-                values = input().split(" ")  # Попробовать сломать
+                values = []
+                for i in range(len(table.columns)):
+                    print(table.columns[i])
+                    values.append(input())
                 table.add(values)
 
             if action == "change":
@@ -156,26 +177,16 @@ if __name__ == "__main__":
                     print(UI.cancel())
                     continue
 
-        # TODO: Разобраться с исключениями
         except FileNotFoundError:
-            print("Ошибка! Таблица с таким именем не найдена. Действие отменяется...")
+            print(UI.fileNotFoundError())
             continue
-        # except ValueError: TODO: loadToTemp Error найти
-        #     print("Ошибка загрузки файла!")
-        except UserWarning:
-            print("Ошибка добавления данных в базу данных!"
-                  "\nВозможные проблемы:"
-                  "\nДанные повреждены или не соответствуют таблице"
-                  "\nПовторяются ключи")
-        except KeyError:
-            print("Ошибка ввода ID таблицы! Действие отменяется...")
+        except QueryError:
+            print(UI.queryError())
             continue
-        except IndexError:
-            print("Значение столбца недопустимо! Действие отменяется...")
+        except BadFileError:
+            print(UI.badFileError())
+            print(UI.cancel())
             continue
-        finally:
-            print(UI.pressAnyButton())
-            input()
 
     cursor.close()
     connection.close()

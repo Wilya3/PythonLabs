@@ -1,4 +1,5 @@
 import csv
+import pandas as pd
 
 
 def addQuotesToList(list):
@@ -15,6 +16,18 @@ def addQuotesToList(list):
     return list
 
 
+def listToPandas(listOfColumns, listOfValues):
+    dataFrame = pd.DataFrame()
+    columnCounter = 0
+    for i in range(len(listOfColumns)):
+        columnOfValues = []
+        for j in range(len(listOfValues)):
+            columnOfValues.append(listOfValues[j][i])
+        dataFrame.insert(columnCounter, listOfColumns[i], columnOfValues)
+        columnCounter += 1
+    return dataFrame
+
+
 # TODO: Разобраться с try-except
 class Table:
     def __init__(self, tableName, cursor, columns):
@@ -27,45 +40,49 @@ class Table:
         """
         Firstly load data to tempList in memory to check file correctness.
         Then clear table and add data from tempList to DB.
-        :raise: ValueError - reading from file problem
-        :raise: UserWarning - adding to DB problem
+        :raise: BadFileError - reading from file problem
+        :raise: QueryError - adding to DB problem
         :param: filePath
         """
-        try:
-            self.loadToTemp(filePath)
-            self.delete()
-            self.loadTempToDB()
-        except Exception:
-            raise UserWarning
+        self.loadToTemp(filePath)
+        self.delete()
+        self.loadTempToDB()
 
     def loadToTemp(self, filePath):
         """
         Load data to tempList in memory to check file correctness.
-        :raise ValueError:
+        :raise BadFileError:
         :param filePath:
         """
-        with open(filePath, "r") as f_obf:
-            reader = csv.reader(f_obf)
-            self.tempValues = []
-            for value in reader:
-                if len(value) == len(self.columns):
-                    readyList = addQuotesToList(value)
-                    self.tempValues.append(readyList)
+        try:
+            with open(filePath, "r") as f_obf:
+                reader = csv.reader(f_obf)
+                self.tempValues = []
+                for value in reader:
+                    if len(value) == len(self.columns):
+                        readyList = addQuotesToList(value)
+                        self.tempValues.append(readyList)
+        except:
+            raise BadFileError
 
     def loadTempToDB(self):
         """
         Take data from self.tempValues and add to DB.
+        :raise QueryError:
         """
-        query = ""
-        for i in range(len(self.tempValues)):  # add rows
-            query += "INSERT INTO " + self.name
-            query += " VALUES ("
-            for j in range(len(self.tempValues[i])):  # add values
-                query += self.tempValues[i][j]
-                if j != len(self.tempValues[i]) - 1:
-                    query += ", "
-            query += ");\n"
-        self.cursor.execute(query)
+        try:
+            query = ""
+            for i in range(len(self.tempValues)):  # add rows
+                query += "INSERT INTO " + self.name
+                query += " VALUES ("
+                for j in range(len(self.tempValues[i])):  # add values
+                    query += self.tempValues[i][j]
+                    if j != len(self.tempValues[i]) - 1:
+                        query += ", "
+                query += ");\n"
+            self.cursor.execute(query)
+        except:
+            raise QueryError
 
     def save(self, filePath):
         """
@@ -81,6 +98,7 @@ class Table:
     def add(self, listOfValues):
         """
         Add new values to DB.
+        :raise QueryError:
         :param list listOfValues:\n
         """
         try:
@@ -94,36 +112,41 @@ class Table:
             query += ");"
             self.cursor.execute(query)
         except:
-            raise AddError
+            raise QueryError
 
     def delete(self, conditionWhere=""):
         """
         Delete values from table with specified conditionWhere
         or all values, if conditionWhere is empty.
+        :raise QueryError:
         :param String conditionWhere:\n
         """
         try:
             query = "DELETE FROM " + self.name
             if conditionWhere != "":
-                    query += "\nWHERE " + conditionWhere
+                query += "\nWHERE " + conditionWhere
             query += ";"
             self.cursor.execute(query)
         except:
-            raise DeleteError
+            raise QueryError
 
     def change(self, column, newValue, conditionWhere=""):
         """
         Change value of specified column . conditionWhere is not necessary.\n
+        :raise QueryError:
         :param String column:\n
         :param String newValue:\n
         :param String conditionWhere:\n
         """
-        query = "UPDATE " + self.name + \
-                "\nSET " + column + " = '" + newValue + "'"
-        if len(conditionWhere) != 0:
-            query += "\nWHERE " + conditionWhere
-        query += ";"
-        self.cursor.execute(query)
+        try:
+            query = "UPDATE " + self.name + \
+                    "\nSET " + column + " = '" + newValue + "'"
+            if len(conditionWhere) != 0:
+                query += "\nWHERE " + conditionWhere
+            query += ";"
+            self.cursor.execute(query)
+        except:
+            raise QueryError
 
     def printTable(self):
         """
@@ -131,5 +154,15 @@ class Table:
         """
         query = "SELECT * FROM " + self.name + ";"
         self.cursor.execute(query)
+        listOfValues = []
         for row in self.cursor:
-            print(row)
+            listOfValues.append(row)
+        dataFrame = listToPandas(self.columns, listOfValues)
+        print(dataFrame)
+
+
+class QueryError(Exception):
+    pass
+
+class BadFileError(Exception):
+    pass
