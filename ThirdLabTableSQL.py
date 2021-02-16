@@ -28,25 +28,24 @@ def listToPandas(listOfColumns, listOfValues):
     return dataFrame
 
 
-# TODO: Разобраться с try-except
 class Table:
     def __init__(self, tableName, cursor, columns):
         self.name = tableName
         self.cursor = cursor
         self.columns = columns  # пока необязательно
-        self.tempValues = []  # Double array. First dimension - rows, second - column.
 
     def loadData(self, filePath):
         """
         Firstly load data to tempList in memory to check file correctness.
         Then clear table and add data from tempList to DB.
+        tempList - Double array. First dimension - rows, second - column.
         :raise: BadFileError - reading from file problem
         :raise: QueryError - adding to DB problem
         :param: filePath
         """
-        self.loadToTemp(filePath)
+        tempList = self.loadToTemp(filePath)
         self.delete()
-        self.loadTempToDB()
+        self.loadTempToDB(tempList)
 
     def loadToTemp(self, filePath):
         """
@@ -57,27 +56,28 @@ class Table:
         try:
             with open(filePath, "r") as f_obf:
                 reader = csv.reader(f_obf)
-                self.tempValues = []
+                tempList = []
                 for value in reader:
                     if len(value) == len(self.columns):
                         readyList = addQuotesToList(value)
-                        self.tempValues.append(readyList)
+                        tempList.append(readyList)
+            return tempList
         except:
             raise BadFileError
 
-    def loadTempToDB(self):
+    def loadTempToDB(self, tempList):
         """
         Take data from self.tempValues and add to DB.
         :raise QueryError:
         """
         try:
             query = ""
-            for i in range(len(self.tempValues)):  # add rows
+            for i in range(len(tempList)):  # add rows
                 query += "INSERT INTO " + self.name
                 query += " VALUES ("
-                for j in range(len(self.tempValues[i])):  # add values
-                    query += self.tempValues[i][j]
-                    if j != len(self.tempValues[i]) - 1:
+                for j in range(len(tempList[i])):  # add values
+                    query += tempList[i][j]
+                    if j != len(tempList[i]) - 1:
                         query += ", "
                 query += ");\n"
             self.cursor.execute(query)

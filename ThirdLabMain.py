@@ -1,10 +1,7 @@
 import psycopg2
-import pandas as pd
 from ThirdLabTableSQL import *
 from ThirdLabUI import UIFactory
 
-
-# TODO: Узнать насчет ввода id
 
 def askTable(listOfTables):
     """
@@ -31,18 +28,6 @@ def printAll(listOfTables):
     for table in listOfTables:
         print("\n" + table.name)
         table.printTable()
-
-
-def listToPandas(listOfColumns, listOfValues):  # Дублируется
-    dataFrame = pd.DataFrame()
-    columnCounter = 0
-    for i in range(len(listOfColumns)):
-        columnOfValues = []
-        for j in range(len(listOfValues)):
-            columnOfValues.append(listOfValues[j][i])
-        dataFrame.insert(columnCounter, listOfColumns[i], columnOfValues)
-        columnCounter += 1
-    return dataFrame
 
 
 def firstTask(cursor):
