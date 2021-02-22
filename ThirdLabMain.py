@@ -46,8 +46,12 @@ def firstTask(cursor):
     listOfValues = []
     for row in cursor:
         listOfValues.append(row)
+
     df = listToPandas(["Название контента", "Название меню", "Ник автора", "Аннотация"], listOfValues)
     print(df)
+    # print("Название контента     Название меню        Ник автора        Аннотация")
+    # for row in cursor:
+    #     print(row)
 
 
 def secondTask(cursor):

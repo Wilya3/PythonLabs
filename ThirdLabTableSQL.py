@@ -17,6 +17,7 @@ def addQuotesToList(list):
 
 
 def listToPandas(listOfColumns, listOfValues):
+    pd.set_option('display.max_columns', None)
     dataFrame = pd.DataFrame()
     columnCounter = 0
     for i in range(len(listOfColumns)):
@@ -158,7 +159,8 @@ class Table:
         for row in self.cursor:
             listOfValues.append(row)
         dataFrame = listToPandas(self.columns, listOfValues)
-        print(dataFrame)
+        if len(dataFrame) != 0:
+            print(dataFrame)
 
 
 class QueryError(Exception):
