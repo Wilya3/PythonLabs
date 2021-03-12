@@ -45,6 +45,13 @@ if __name__ == "__main__":
     connection.commit()
 
     print("Задание №1: ")
+    cursor.execute("SELECT DISTINCT firm.title, function.title"
+                   "\nFROM firm JOIN person ON (firm.id = person.id_firm)"
+                   "\nJOIN function ON (person.id_function = function.id);")
+    values = cursor.fetchall()
+    print(listToPandas(["Название фирмы", "Должность"], values))
+
+    print("Задание №2: ")
     cursor.execute("SELECT firm.title, COUNT(*) as number_of_persons"
                    "\nFROM firm JOIN person ON (firm.id = person.id_firm)"
                    "\nWHERE person.age BETWEEN 20 AND 30"
@@ -54,7 +61,7 @@ if __name__ == "__main__":
     values = cursor.fetchall()
     print(listToPandas(["Название фирмы", "Количество человек"], values))
 
-    print("Задание №2: ")
+    print("Задание №3: ")
     cursor.execute("SELECT person.fullname"
                    "\nFROM person JOIN function ON (person.id_function = function.id)"
                    "\nJOIN firm ON (person.id_firm = firm.id)"
